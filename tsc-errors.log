@@ -1,0 +1,6 @@
+﻿src/app/(dashboard)/layout.tsx(30,28): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between profiles and companies">'.
+src/app/(dashboard)/page.tsx(117,75): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between deliveries and clients">'.
+src/app/(dashboard)/page.tsx(135,99): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between purchases and manufacturers">'.
+src/app/(dashboard)/transfers/page.tsx(58,101): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between stock_transfers and warehouses">'.
+src/app/(dashboard)/transfers/page.tsx(59,93): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between stock_transfers and warehouses">'.
+src/app/(dashboard)/transfers/page.tsx(60,81): error TS2339: Property 'name' does not exist on type 'SelectQueryError<"could not find the relation between stock_transfers and products">'.
