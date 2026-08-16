@@ -15,11 +15,13 @@ export function DeliveryDialog({
   clients,
   warehouses,
   products,
+  onOptimisticAdd,
   children 
 }: {
   clients: { id: string, name: string }[];
   warehouses: { id: string, name: string }[];
   products: { id: string, name: string, unit_price: number }[];
+  onOptimisticAdd?: (delivery: any) => void;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -39,6 +41,7 @@ export function DeliveryDialog({
           warehouses={warehouses} 
           products={products} 
           onSuccess={() => setOpen(false)} 
+          onOptimisticAdd={onOptimisticAdd}
         />
       </DialogContent>
     </Dialog>

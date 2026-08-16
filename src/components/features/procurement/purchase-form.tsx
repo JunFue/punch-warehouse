@@ -11,12 +11,14 @@ export function PurchaseForm({
   manufacturers,
   warehouses,
   products,
-  onSuccess 
+  onSuccess,
+  onOptimisticAdd
 }: { 
   manufacturers: { id: string, name: string }[];
   warehouses: { id: string, name: string }[];
   products: { id: string, name: string, unit_price: number }[];
   onSuccess?: () => void;
+  onOptimisticAdd?: (purchase: any) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,6 +75,17 @@ export function PurchaseForm({
       }))
     };
     
+    // Fire optimistic payload
+    onOptimisticAdd?.({
+      id: `temp-${Date.now()}`,
+      order_date: payload.order_date,
+      manufacturers: { name: manufacturers.find(m => m.id === payload.manufacturer_id)?.name },
+      status: "pending",
+      total_amount: totalAmount,
+      amount_paid: 0,
+      pending: true
+    });
+
     const result = await addPurchase(payload);
 
     if (result.error) {

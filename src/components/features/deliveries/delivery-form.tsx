@@ -11,12 +11,14 @@ export function DeliveryForm({
   clients,
   warehouses,
   products,
-  onSuccess 
+  onSuccess,
+  onOptimisticAdd
 }: { 
   clients: { id: string, name: string }[];
   warehouses: { id: string, name: string }[];
   products: { id: string, name: string, unit_price: number }[]; // this can represent the selling price explicitly
   onSuccess?: () => void;
+  onOptimisticAdd?: (delivery: any) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,17 @@ export function DeliveryForm({
       }))
     };
     
+    // Inject optimistic ui instantly
+    onOptimisticAdd?.({
+      id: `temp-${Date.now()}`,
+      delivery_date: payload.delivery_date,
+      clients: { name: clients.find(c => c.id === payload.client_id)?.name },
+      status: "pending",
+      total_amount: totalAmount,
+      amount_collected: 0,
+      pending: true
+    });
+
     const result = await addDelivery(payload);
 
     if (result.error) {

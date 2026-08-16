@@ -18,10 +18,12 @@ export interface ProductData {
 
 export function ProductForm({ 
   initialData, 
-  onSuccess 
+  onSuccess,
+  onOptimisticSave
 }: { 
   initialData?: ProductData;
   onSuccess?: () => void;
+  onOptimisticSave?: (product: any) => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,6 +31,17 @@ export function ProductForm({
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     setError(null);
+    
+    // Optimistic UI emission
+    onOptimisticSave?.({
+      id: initialData?.id || `temp-${Date.now()}`,
+      name: formData.get("name"),
+      sku: formData.get("sku"),
+      unit: formData.get("unit"),
+      unit_price: Number(formData.get("unit_price")),
+      description: formData.get("description"),
+      pending: true
+    });
     
     let result;
     if (initialData) {

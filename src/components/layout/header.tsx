@@ -12,6 +12,7 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Settings, User } from "lucide-react";
+import { useTransition } from "react";
 
 interface HeaderProps {
   user: {
@@ -22,6 +23,8 @@ interface HeaderProps {
 }
 
 export function Header({ user }: HeaderProps) {
+  const [isPending, startTransition] = useTransition();
+
   const initials = user?.fullName
     ? user.fullName
         .split(" ")
@@ -87,11 +90,12 @@ export function Header({ user }: HeaderProps) {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 id="menu-signout"
-                onClick={() => signOut()}
-                className="text-destructive focus:text-destructive"
+                disabled={isPending}
+                onClick={() => startTransition(() => { signOut() })}
+                className="text-destructive focus:text-destructive cursor-pointer"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
+                {isPending ? "Signing out..." : "Sign Out"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

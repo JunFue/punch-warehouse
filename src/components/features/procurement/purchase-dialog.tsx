@@ -15,11 +15,13 @@ export function PurchaseDialog({
   manufacturers,
   warehouses,
   products,
+  onOptimisticAdd,
   children 
 }: {
   manufacturers: { id: string, name: string }[];
   warehouses: { id: string, name: string }[];
   products: { id: string, name: string, unit_price: number }[];
+  onOptimisticAdd?: (purchase: any) => void;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -39,6 +41,7 @@ export function PurchaseDialog({
           warehouses={warehouses} 
           products={products} 
           onSuccess={() => setOpen(false)} 
+          onOptimisticAdd={onOptimisticAdd}
         />
       </DialogContent>
     </Dialog>
