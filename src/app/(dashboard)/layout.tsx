@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
   children,
@@ -19,7 +20,7 @@ export default async function DashboardLayout({
   if (user) {
     const { data } = await supabase
       .from("profiles")
-      .select("full_name, role, status, companies(name)")
+      .select("full_name, role, status, company_id, companies(name)")
       .eq("id", user.id)
       .single();
 
@@ -29,7 +30,14 @@ export default async function DashboardLayout({
         data.companies && !Array.isArray(data.companies)
           ? data.companies.name
           : null;
+          
+      // Ensure users without a company are redirected to setup
+      if (!data.company_id) {
+        redirect("/onboarding");
+      }
     }
+  } else {
+    redirect("/login");
   }
 
   return (

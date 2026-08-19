@@ -13,19 +13,28 @@ export type Database = {
         Row: {
           id: string;
           name: string;
-          invite_code: string;
+          address: string | null;
+          business_type: string | null;
+          invite_otp: string | null;
+          invite_otp_expires_at: string | null;
           created_at: string;
         };
         Insert: {
           id?: string;
           name: string;
-          invite_code?: string;
+          address?: string | null;
+          business_type?: string | null;
+          invite_otp?: string | null;
+          invite_otp_expires_at?: string | null;
           created_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
-          invite_code?: string;
+          address?: string | null;
+          business_type?: string | null;
+          invite_otp?: string | null;
+          invite_otp_expires_at?: string | null;
           created_at?: string;
         };
         Relationships: any[];

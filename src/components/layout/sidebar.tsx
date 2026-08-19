@@ -15,6 +15,7 @@ import {
   Receipt,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -79,6 +80,12 @@ const navItems = [
     icon: Receipt,
     section: "finance",
   },
+  {
+    label: "Settings",
+    href: "/settings",
+    icon: Settings,
+    section: "admin",
+  },
 ];
 
 const sections: Record<string, string> = {
@@ -87,6 +94,7 @@ const sections: Record<string, string> = {
   procurement: "Procurement",
   deliveries: "Sales",
   finance: "Finance",
+  admin: "Administration",
 };
 
 export function Sidebar() {
