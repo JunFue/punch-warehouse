@@ -39,7 +39,7 @@ export function ProductsClient({
 
   return (
     <>
-      <div className="absolute top-0 right-0 -mt-14 mr-6">
+      <div className="flex justify-end mb-4">
         <ProductDialog 
           manufacturers={manufacturers}
           warehouses={warehouses}
@@ -58,6 +58,15 @@ export function ProductsClient({
           <p className="text-sm text-muted-foreground mt-1 max-w-sm">
             Start by adding your first product to the catalog. Products can be assigned to warehouses and used in deliveries.
           </p>
+          <div className="mt-6">
+            <ProductDialog 
+              manufacturers={manufacturers}
+              warehouses={warehouses}
+              onOptimisticSave={(product) => addOptimisticProduct(product)}
+            >
+              <Button>Add First Product</Button>
+            </ProductDialog>
+          </div>
         </div>
       ) : (
         <Table>
