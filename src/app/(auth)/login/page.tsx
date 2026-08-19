@@ -294,7 +294,7 @@ export default function LoginPage() {
 export function GoogleAuthButton() {
   const handleGoogleLogin = async () => {
     const supabase = createClient();
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
     
     await supabase.auth.signInWithOAuth({
       provider: 'google',
