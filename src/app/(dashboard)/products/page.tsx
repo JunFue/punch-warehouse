@@ -13,14 +13,9 @@ export default async function ProductsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let products: {
-    id: string;
-    name: string;
-    sku: string;
-    unit: string;
-    unit_price: number;
-    description: string | null;
-  }[] = [];
+  let products: any[] = [];
+  let manufacturers: { id: string; name: string }[] = [];
+  let warehouses: { id: string; name: string }[] = [];
 
   if (user) {
     const { data: profile } = await supabase
@@ -30,13 +25,38 @@ export default async function ProductsPage() {
       .single();
 
     if (profile?.company_id) {
-      const { data } = await supabase
-        .from("products")
-        .select("id, name, sku, unit, unit_price, description")
-        .eq("company_id", profile.company_id)
-        .order("name");
+      const [productsRes, mfgRes, whRes] = await Promise.all([
+        supabase
+          .from("products")
+          .select("id, name, sku, unit, unit_price, description, manufacturer_id, warehouse_stock(quantity)")
+          .eq("company_id", profile.company_id)
+          .order("name"),
+        supabase
+          .from("manufacturers")
+          .select("id, name")
+          .eq("company_id", profile.company_id)
+          .order("name"),
+        supabase
+          .from("warehouses")
+          .select("id, name")
+          .eq("company_id", profile.company_id)
+          .eq("is_active", true)
+          .order("name")
+      ]);
 
-      if (data) products = data;
+      if (productsRes.data) {
+        products = productsRes.data.map(p => {
+          // @ts-ignore - warehouse_stock is an array from the joined query
+          const totalStock = p.warehouse_stock?.reduce((sum, stock) => sum + (Number(stock.quantity) || 0), 0) || 0;
+          return {
+            ...p,
+            current_stock: totalStock
+          };
+        });
+      }
+      
+      if (mfgRes.data) manufacturers = mfgRes.data;
+      if (whRes.data) warehouses = whRes.data;
     }
   }
 
@@ -54,7 +74,11 @@ export default async function ProductsPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <ProductsClient initialProducts={products} />
+          <ProductsClient 
+            initialProducts={products} 
+            manufacturers={manufacturers}
+            warehouses={warehouses}
+          />
         </CardContent>
       </Card>
     </PageContainer>

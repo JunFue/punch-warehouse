@@ -14,7 +14,15 @@ import { Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProductDialog } from "@/components/features/inventory/product-dialog";
 
-export function ProductsClient({ initialProducts }: { initialProducts: any[] }) {
+export function ProductsClient({ 
+  initialProducts,
+  manufacturers,
+  warehouses
+}: { 
+  initialProducts: any[];
+  manufacturers: { id: string; name: string }[];
+  warehouses: { id: string; name: string }[];
+}) {
   const [optimisticProducts, addOptimisticProduct] = useOptimistic(
     initialProducts,
     (state, newProduct: any) => {
@@ -32,7 +40,11 @@ export function ProductsClient({ initialProducts }: { initialProducts: any[] }) 
   return (
     <>
       <div className="absolute top-0 right-0 -mt-14 mr-6">
-        <ProductDialog onOptimisticSave={(product) => addOptimisticProduct(product)}>
+        <ProductDialog 
+          manufacturers={manufacturers}
+          warehouses={warehouses}
+          onOptimisticSave={(product) => addOptimisticProduct(product)}
+        >
           <Button id="add-product-btn">Add Product</Button>
         </ProductDialog>
       </div>
@@ -55,7 +67,8 @@ export function ProductsClient({ initialProducts }: { initialProducts: any[] }) 
               <TableHead>SKU</TableHead>
               <TableHead>Unit</TableHead>
               <TableHead className="text-right">Unit Price</TableHead>
-              <TableHead className="w-[80px]"></TableHead>
+              <TableHead className="text-right">Current Stock</TableHead>
+              <TableHead className="w-20"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -78,9 +91,20 @@ export function ProductsClient({ initialProducts }: { initialProducts: any[] }) 
                     minimumFractionDigits: 2,
                   })}
                 </TableCell>
+                <TableCell className="text-right">
+                  {product.current_stock > 0 ? (
+                    <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 py-0.5">
+                      {product.current_stock}
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="py-0.5">Out of stock</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
                   <ProductDialog 
-                    product={product} 
+                    product={product}
+                    manufacturers={manufacturers}
+                    warehouses={warehouses}
                     onOptimisticSave={(editedProduct) => addOptimisticProduct({ ...editedProduct, id: product.id })}
                   >
                     <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">

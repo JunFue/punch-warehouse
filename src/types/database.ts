@@ -108,6 +108,7 @@ export type Database = {
         Row: {
           id: string;
           company_id: string;
+          manufacturer_id: string | null;
           name: string;
           sku: string;
           unit: string;
@@ -118,6 +119,7 @@ export type Database = {
         Insert: {
           id?: string;
           company_id: string;
+          manufacturer_id?: string | null;
           name: string;
           sku: string;
           unit: string;
@@ -128,6 +130,7 @@ export type Database = {
         Update: {
           id?: string;
           company_id?: string;
+          manufacturer_id?: string | null;
           name?: string;
           sku?: string;
           unit?: string;
@@ -135,7 +138,15 @@ export type Database = {
           description?: string | null;
           created_at?: string;
         };
-        Relationships: any[];
+        Relationships: [
+          {
+            foreignKeyName: "products_manufacturer_id_fkey";
+            columns: ["manufacturer_id"];
+            isOneToOne: false;
+            referencedRelation: "manufacturers";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       warehouse_stock: {
         Row: {

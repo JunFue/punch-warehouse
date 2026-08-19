@@ -44,20 +44,39 @@ export async function addProduct(formData: FormData) {
   const unit = formData.get("unit") as string;
   const unit_price = parseFloat(formData.get("unit_price") as string);
   const description = formData.get("description") as string;
+  const manufacturer_id = formData.get("manufacturer_id") as string;
+  const initialStockWhId = formData.get("initial_stock_warehouse_id") as string;
+  const initialStockQty = parseFloat(formData.get("initial_stock_quantity") as string);
 
-  const { error: insertError } = await supabase
+  const { data: newProduct, error: insertError } = await supabase
     .from("products")
     .insert({
       company_id: companyId,
+      manufacturer_id: manufacturer_id || null,
       name,
       sku,
       unit,
       unit_price,
       description: description || null,
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !newProduct) {
+    return { error: insertError?.message || "Failed to create product" };
+  }
+
+  // If initial stock was provided, inject it instantly
+  if (initialStockWhId && !isNaN(initialStockQty) && initialStockQty > 0) {
+    const { error: stockError } = await supabase.from("warehouse_stock").insert({
+      product_id: newProduct.id,
+      warehouse_id: initialStockWhId,
+      quantity: initialStockQty
     });
 
-  if (insertError) {
-    return { error: insertError.message };
+    if (stockError) {
+      return { error: "Product created but failed to assign initial stock: " + stockError.message };
+    }
   }
 
   revalidatePath("/products");
@@ -73,12 +92,14 @@ export async function updateProduct(id: string, formData: FormData) {
   const unit = formData.get("unit") as string;
   const unit_price = parseFloat(formData.get("unit_price") as string);
   const description = formData.get("description") as string;
+  const manufacturer_id = formData.get("manufacturer_id") as string;
 
   // We don't strictly need company_id for update since RLS blocks updating other companies' products,
   // but it's safe to just reference the ID.
   const { error: updateError } = await supabase
     .from("products")
     .update({
+      manufacturer_id: manufacturer_id || null,
       name,
       sku,
       unit,

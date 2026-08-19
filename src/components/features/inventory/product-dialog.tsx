@@ -13,10 +13,14 @@ import { ProductForm, ProductData } from "./product-form";
 
 export function ProductDialog({ 
   product, 
+  manufacturers,
+  warehouses,
   onOptimisticSave,
   children 
 }: { 
   product?: ProductData;
+  manufacturers?: { id: string; name: string }[];
+  warehouses?: { id: string; name: string }[];
   onOptimisticSave?: (product: any) => void;
   children: ReactNode;
 }) {
@@ -34,6 +38,8 @@ export function ProductDialog({
         </DialogHeader>
         <ProductForm 
           initialData={product} 
+          manufacturers={manufacturers}
+          warehouses={warehouses}
           onSuccess={() => setOpen(false)} 
           onOptimisticSave={onOptimisticSave}
         />
