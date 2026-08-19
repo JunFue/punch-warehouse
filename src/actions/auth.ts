@@ -51,50 +51,15 @@ export async function signUp(formData: FormData) {
     return { error: "Failed to create account" };
   }
 
-  // If user provides an invite code, join existing company
-  if (inviteCode) {
-    const { data: company, error: companyError } = await supabase
-      .from("companies")
-      .select("id")
-      .eq("invite_code", inviteCode.toUpperCase())
-      .single();
+  // Create an initial bare profile for the new user. 
+  // They will be dynamically routed to /onboarding because they lack a company.
+  const { error: profileError } = await supabase.from("profiles").upsert({
+    id: authData.user.id,
+    full_name: fullName,
+  });
 
-    if (companyError || !company) {
-      return { error: "Invalid invite code" };
-    }
-
-    // Create profile as pending member
-    await supabase.from("profiles").upsert({
-      id: authData.user.id,
-      company_id: company.id,
-      full_name: fullName,
-      role: "member",
-      status: "pending",
-    });
-  } else if (companyName) {
-    // Create a new company
-    const inviteCodeGenerated = generateInviteCode();
-    const { data: newCompany, error: companyError } = await supabase
-      .from("companies")
-      .insert({
-        name: companyName,
-        invite_code: inviteCodeGenerated,
-      })
-      .select()
-      .single();
-
-    if (companyError || !newCompany) {
-      return { error: "Failed to create company" };
-    }
-
-    // Create profile as owner (auto-approved)
-    await supabase.from("profiles").upsert({
-      id: authData.user.id,
-      company_id: newCompany.id,
-      full_name: fullName,
-      role: "owner",
-      status: "approved",
-    });
+  if (profileError) {
+    return { error: "Account created, but profile initialization failed." };
   }
 
   revalidatePath("/", "layout");
@@ -107,11 +72,3 @@ export async function signOut() {
   redirect("/login");
 }
 
-function generateInviteCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
